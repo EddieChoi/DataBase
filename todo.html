@@ -1,0 +1,77 @@
+﻿<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>최웅권 - ToDo</title>
+		<script>
+			var todosqlite = {};
+			todosqlite.webdb = {};
+			todosqlite.webdb.db = null;
+
+			//시작
+			function init(){
+				 todosqlite.webdb.open();
+				todosqlite.wedb.createTable();
+			}
+			//데이터베이스 연결
+			todosqlite.webdb.open = function(){
+				var dbSize = 5 * 1024 * 1024 ; //5MB
+				todosqlite.webdb.db = openDateabase("Todo","1.0","Todo manager", dbSize);
+			}
+			//테이블생성
+			todosqlite.wedb.createTable = function() {
+				var db = todo sqlite.webdb.db;
+				db.transaction(function(tx){
+					tx.executeSql("CREATE TAVLE IF NOT EXISTS
+					todo(ID INTEGER PRIMARY KEY ASC, 
+					todo TEXT, added_on DATETIME)".[]);
+					});
+				}
+			//추가 버튼을 누를 때 호출하는 함수
+			function addTodo() {
+				var todo = document.getElementById("todo");
+				todosqlite.webdb.addTodo(todo.value);
+				todo.value = "";
+			}
+			//저장
+			todosqlite.webdb.addTodo = function(todoText){
+				var db = todosqlite.webdb.db;
+				db.transaction(function(tx){
+					var addenOn = new Date();
+					tx.executeSql("INSERT INTO todo(todo,added_on) VALUES (?,?)",
+					[todoText, addedOn], todosqlite.webdb.onSuccess,todosqlite.webdb.onError);
+				});
+			}
+			//성공
+			todosqlite.webdb.onSuccess = function(tx, r){
+				todosqlite.webdb.getAllTodoItems(loadTodoItems);
+			}
+			//실패
+			todosqlite.webdb.onError = function(tx, e){
+				alert("오류 : " + e.sessage);
+			}
+
+			//테이블에서 목록 불러오기
+			function loadTodoItems(tx, rs){
+				var rowOutput = "";
+				var todoItems = document.getElementById("todoItems");
+				for(var i=0; i < rs.rows.length; i++){
+					rowOutput += renderTodo(rs.rows.item(i));
+				}
+				todoItems.innerHTML = rowOutput;	
+			}
+			//테이블 내용을 HTML로 출력
+			function renderTodo(row){
+				return"<li>" + row.todo + "[
+				ahref='javascript:void(0);' onclick='todosqlite.webdb.deleteTodo'(" + row.ID+")>삭제</a>]</li>";
+			}
+		</script>
+	</head>	
+	<body onload="init();">
+		<ul id="todoItems"></ul>
+		<form type="post" onsubmit="addTodo(); return false;">
+		<input type="text" id="todo" name="todo"
+placeholder="내용을 입력해주세요." style="width:200px" />
+		<input type="submit" value="추가"/>
+		</form>
+	</body>
+</html>
